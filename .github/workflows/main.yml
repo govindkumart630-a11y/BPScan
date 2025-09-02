@@ -1,0 +1,158 @@
+BPS/
+ ├── app/
+ │   ├── src/
+ │   │   ├── main/
+ │   │   │   ├── AndroidManifest.xml
+ │   │   │   ├── java/com/example/bps/MainActivity.java
+ │   │   │   └── res/layout/activity_main.xml
+ │   ├── build.gradle
+ ├── build.gradle
+ └── settings.gradle
+rootProject.name = "BPS"
+include ':app'
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.0'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace "com.example.bps"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.bps"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+}
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.bps">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="BPS"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+package com.example.bps;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    Spinner varietySpinner;
+    ImageView imageView;
+    Button btnScan;
+
+    ActivityResultLauncher<String> imagePicker;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        varietySpinner = findViewById(R.id.varietySpinner);
+        imageView = findViewById(R.id.imageView);
+        btnScan = findViewById(R.id.btnScan);
+
+        // Dropdown options
+        String[] varieties = {"1121", "1718", "1401", "1509", "1847", "1885", "1886"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, varieties);
+        varietySpinner.setAdapter(adapter);
+
+        // Image Picker
+        imagePicker = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        imageView.setImageURI(uri);
+                        Toast.makeText(this, "Image Selected!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        btnScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imagePicker.launch("image/*");
+            }
+        });
+    }
+}
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <Spinner
+        android:id="@+id/varietySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="20dp"
+        android:background="#DDDDDD" />
+
+    <Button
+        android:id="@+id/btnScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan / Upload Paddy"
+        android:layout_marginTop="20dp" />
+
+</LinearLayout>
